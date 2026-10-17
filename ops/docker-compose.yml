@@ -1,0 +1,24 @@
+services:
+  db:
+    image: postgres:16
+    environment: { POSTGRES_USER: ops, POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?set in .env}", POSTGRES_DB: ops }
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U ops"], interval: 5s, retries: 10 }
+  migrate:   # one-shot: schema migrations + idempotent seed
+    build: ./backend
+    command: sh -c "alembic upgrade head && python -m app.seed"
+    env_file: .env
+    environment: { DATABASE_URL: "postgresql+psycopg://ops:${POSTGRES_PASSWORD}@db:5432/ops" }
+    depends_on: { db: { condition: service_healthy } }
+  api:
+    build: ./backend
+    env_file: .env
+    environment: { DATABASE_URL: "postgresql+psycopg://ops:${POSTGRES_PASSWORD}@db:5432/ops" }
+    ports: ["8000:8000"]
+    depends_on: { migrate: { condition: service_completed_successfully } }
+    healthcheck: { test: ["CMD", "python", "-c", "import urllib.request as u;u.urlopen('http://localhost:8000/health/ready')"], interval: 10s, retries: 5 }
+  web:
+    build: { context: ./frontend, args: { VITE_API_BASE_URL: "${PUBLIC_API_URL:-http://localhost:8000}" } }
+    ports: ["8080:80"]
+    depends_on: [api]
+volumes: { pgdata: {} }

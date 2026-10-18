@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="js/theme-init.js"></script>
+  <title>Reconciliation cases · SCIPEC Operations</title>
+  <link rel="stylesheet" href="vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="cases.html" data-title="Reconciliation cases" data-perm="reconcile:read">
+  <a class="visually-hidden-focusable" href="#content">Skip to content</a>
+  <div class="d-flex min-vh-100">
+    <aside id="sidebar" class="offcanvas-lg offcanvas-start sidebar" tabindex="-1" aria-label="Navigation"></aside>
+    <div class="flex-grow-1 d-flex flex-column min-w-0">
+      <header id="topbar" class="topbar"></header>
+      <main id="content" class="flex-grow-1 p-3 p-lg-4">
+        <p class="text-muted">One case per delivery whose factory receipt differs from the dispatch by more than the limit. Variance = received − dispatched; a negative value means fruit was lost in transit. Original quantities are never edited.</p>
+        <div class="mb-3"><label class="form-label small mb-1" for="fStatus">Show</label><select class="form-select w-auto" id="fStatus"><option value="open">Open</option><option value="resolved">Resolved</option><option value="">All</option></select></div>
+        <div class="card"><div class="table-responsive"><table class="table table-hover align-middle mb-0">
+          <caption class="visually-hidden">Delivery reconciliation cases</caption>
+          <thead><tr><th>Delivery</th><th>Dispatched (t)</th><th>Received (t)</th><th>Variance (t)</th><th>Status</th><th>Resolution</th></tr></thead>
+          <tbody id="rows"></tbody></table></div></div>
+        <div id="pager" class="mt-3"></div>
+      </main>
+      <footer class="px-4 py-3 tw-text-sm tw-text-gray-600">SCIPEC · <a href="https://scipec.vercel.app" target="_blank" rel="noopener">scipec.vercel.app</a></footer>
+    </div>
+  </div>
+  <div id="toasts" class="toast-container position-fixed bottom-0 end-0 p-3" aria-live="polite"></div>
+  <div class="modal fade" id="resolve" tabindex="-1" aria-labelledby="resolveTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg"><form class="modal-content" id="resolveForm" novalidate>
+      <div class="modal-header"><h2 class="modal-title fs-5" id="resolveTitle">Resolve case</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+      <div class="modal-body"><div class="alert alert-danger d-none form-error" role="alert"></div>
+        <div class="row g-3"><div class="col-12"><label class="form-label" for="reason">Explanation (required, kept in the audit trail)</label><textarea class="form-control" id="reason" name="reason" rows="2" required minlength="5" maxlength="2000"></textarea><div class="invalid-feedback">Check this field.</div></div><input type="hidden" id="caseId"><input type="hidden" id="caseVersion"></div></div>
+      <div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary">Resolve case</button></div>
+    </form></div></div>
+  <script src="vendor/bootstrap.bundle.min.js"></script>
+  <script type="module" src="js/cases.js"></script>
+</body>
+</html>

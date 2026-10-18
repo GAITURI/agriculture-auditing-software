@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="js/theme-init.js"></script>
+  <title>Overview · SCIPEC Operations</title>
+  <link rel="stylesheet" href="vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="dashboard.html" data-title="Overview" data-perm="report:read">
+  <a class="visually-hidden-focusable" href="#content">Skip to content</a>
+  <div class="d-flex min-vh-100">
+    <aside id="sidebar" class="offcanvas-lg offcanvas-start sidebar" tabindex="-1" aria-label="Navigation"></aside>
+    <div class="flex-grow-1 d-flex flex-column min-w-0">
+      <header id="topbar" class="topbar"></header>
+      <main id="content" class="flex-grow-1 p-3 p-lg-4">
+        <div class="d-flex flex-wrap align-items-end gap-3 mb-4">
+          <div class="flex-grow-1"><h2 class="fs-4 mb-0" id="greet">Hi</h2><p class="text-muted mb-0 small" id="sub">Loading operations overview…</p></div>
+          <form id="rangeForm" class="d-flex flex-wrap gap-2 align-items-end">
+            <div><label class="form-label small mb-1" for="start">From</label><input class="form-control form-control-sm" type="date" id="start" required></div>
+            <div><label class="form-label small mb-1" for="end">To</label><input class="form-control form-control-sm" type="date" id="end" required></div>
+            <button class="btn btn-primary btn-sm" type="submit">Refresh</button></form></div>
+        <div id="alerts"></div>
+        <section aria-label="Key figures"><div id="kpis" class="row g-3 mb-3"></div><div id="tiles" class="row g-3 mb-4"></div></section>
+        <div class="row g-3 mb-3">
+          <div class="col-xl-8"><section class="card h-100"><div class="card-body">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3"><h2 class="panel-title">Tonnage trend</h2>
+              <div class="btn-group" role="group" aria-label="Group chart by">
+                <input type="radio" class="btn-check" name="freq" id="fD" value="D" checked><label class="btn btn-outline-primary btn-sm" for="fD">Daily</label>
+                <input type="radio" class="btn-check" name="freq" id="fW" value="W"><label class="btn btn-outline-primary btn-sm" for="fW">Weekly</label>
+                <input type="radio" class="btn-check" name="freq" id="fM" value="M"><label class="btn btn-outline-primary btn-sm" for="fM">Monthly</label></div></div>
+            <div id="chart"></div></div></section></div>
+          <div class="col-xl-4"><section class="card h-100"><div class="card-body"><div class="d-flex justify-content-between align-items-center mb-2"><h2 class="panel-title">In transit now</h2><a href="deliveries.html" class="small">See all</a></div><ul id="transit" class="list-unstyled mb-0"></ul></div></section></div></div>
+        <div class="row g-3">
+          <div class="col-lg-6"><section class="card h-100"><div class="card-body"><div class="d-flex justify-content-between align-items-center mb-2"><h2 class="panel-title">Open reconciliation cases</h2><a href="cases.html" class="small">See all</a></div><ul id="cases" class="list-unstyled mb-0"></ul></div></section></div>
+          <div class="col-lg-6"><section class="card h-100"><div class="card-body"><h2 class="panel-title mb-2" id="sideTitle">Recent activity</h2><ul id="activityList" class="list-unstyled mb-0 small"></ul></div></section></div></div>
+      </main>
+      <footer class="px-4 py-3 tw-text-sm tw-text-gray-600">SCIPEC · <a href="https://scipec.vercel.app" target="_blank" rel="noopener">scipec.vercel.app</a></footer>
+    </div>
+  </div>
+  <div id="toasts" class="toast-container position-fixed bottom-0 end-0 p-3" aria-live="polite"></div>
+
+  <script src="vendor/bootstrap.bundle.min.js"></script>
+  <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>

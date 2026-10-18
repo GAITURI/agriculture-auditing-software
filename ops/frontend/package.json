@@ -1,9 +1,21 @@
 {
-  "name": "operational-tracking-dashboard",
+  "name": "scipec-operations-frontend",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
-  "scripts": { "dev": "vite", "build": "vite build", "preview": "vite preview" },
-  "dependencies": { "react": "^18.3.1", "react-dom": "^18.3.1", "recharts": "^2.12.7" },
-  "devDependencies": { "@vitejs/plugin-react": "^4.3.1", "vite": "^5.4.0" }
+  "scripts": {
+    "vendor": "node scripts/copy-vendor.mjs",
+    "build:css": "tailwindcss -i ./css/input.css -o ./css/styles.css --minify",
+    "watch:css": "tailwindcss -i ./css/input.css -o ./css/styles.css --watch",
+    "build": "npm run vendor && npm run build:css && node scripts/build.mjs",
+    "start": "node scripts/serve.mjs",
+    "dev": "node scripts/serve.mjs --src"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.3"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "tailwindcss": "^3.4.17"
+  }
 }

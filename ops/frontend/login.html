@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="js/theme-init.js"></script>
+<title>Sign in · SCIPEC Operations</title>
+<link rel="stylesheet" href="vendor/bootstrap.min.css"><link rel="stylesheet" href="css/theme.css"><link rel="stylesheet" href="css/styles.css"></head>
+<body class="d-flex align-items-center min-vh-100">
+<main class="container" style="max-width:440px">
+  <h1 class="tw-text-2xl tw-font-bold tw-text-frond mb-1">SCIPEC Operations</h1>
+  <p class="text-muted">Sign in to record and review plantation and factory operations.</p>
+  <div id="notice" class="alert alert-warning d-none" role="status"></div>
+  <form id="loginForm" class="card card-body tw-shadow-sm" novalidate>
+    <div class="alert alert-danger d-none form-error" role="alert"></div>
+    <label class="form-label" for="email">Email</label>
+    <input class="form-control mb-3" type="email" id="email" name="email" autocomplete="username" required>
+    <div class="invalid-feedback">Enter your email address.</div>
+    <label class="form-label" for="password">Password</label>
+    <div class="input-group mb-3"><input class="form-control" type="password" id="password" name="password" autocomplete="current-password" required>
+      <button class="btn btn-outline-secondary" type="button" id="togglePw" aria-pressed="false" aria-controls="password">Show</button></div>
+    <button class="btn btn-primary" type="submit">Sign in</button>
+  </form>
+  <p class="tw-text-sm tw-text-gray-600 mt-3"><a href="https://scipec.vercel.app" target="_blank" rel="noopener">scipec.vercel.app</a></p>
+</main>
+<script src="vendor/bootstrap.bundle.min.js"></script><script type="module" src="js/login.js"></script></body></html>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="js/theme-init.js"></script>
+  <title>Daily reconciliation · SCIPEC Operations</title>
+  <link rel="stylesheet" href="vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="reconciliation.html" data-title="Daily reconciliation" data-perm="report:read">
+  <a class="visually-hidden-focusable" href="#content">Skip to content</a>
+  <div class="d-flex min-vh-100">
+    <aside id="sidebar" class="offcanvas-lg offcanvas-start sidebar" tabindex="-1" aria-label="Navigation"></aside>
+    <div class="flex-grow-1 d-flex flex-column min-w-0">
+      <header id="topbar" class="topbar"></header>
+      <main id="content" class="flex-grow-1 p-3 p-lg-4">
+        <p class="text-muted">Daily totals compared over a two-day window so overnight deliveries don't raise false alarms. For individual trucks see Reconciliation cases.</p>
+        <form id="rangeForm" class="d-flex flex-wrap gap-2 align-items-end mb-3">
+          <div><label class="form-label small mb-1" for="start">From</label><input class="form-control" type="date" id="start" required></div>
+          <div><label class="form-label small mb-1" for="end">To</label><input class="form-control" type="date" id="end" required></div>
+          <button class="btn btn-primary" type="submit">Refresh</button><button class="btn btn-outline-primary" type="button" id="exportCsv">Export CSV</button></form>
+        <div class="d-flex gap-3 small mb-2"><span>■ Within limit</span><span>▲ Over limit</span><span>○ Records missing</span></div>
+        <div id="strip" class="strip mb-3" role="list"></div>
+        <div class="card"><div class="table-responsive"><table class="table table-sm align-middle mb-0">
+          <caption class="visually-hidden">Daily reconciliation</caption>
+          <thead><tr><th>Date</th><th>Collected</th><th>Transported</th><th>Received</th><th>Difference</th><th>2-day difference</th><th>Yield %</th><th>Status</th></tr></thead>
+          <tbody id="rows"></tbody></table></div></div>
+      </main>
+      <footer class="px-4 py-3 tw-text-sm tw-text-gray-600">SCIPEC · <a href="https://scipec.vercel.app" target="_blank" rel="noopener">scipec.vercel.app</a></footer>
+    </div>
+  </div>
+  <div id="toasts" class="toast-container position-fixed bottom-0 end-0 p-3" aria-live="polite"></div>
+
+  <script src="vendor/bootstrap.bundle.min.js"></script>
+  <script type="module" src="js/reconciliation.js"></script>
+</body>
+</html>

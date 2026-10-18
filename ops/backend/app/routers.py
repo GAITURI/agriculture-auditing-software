@@ -191,8 +191,16 @@ def resolve(id: int, p: ResolveIn, u: User = Depends(require("reconcile:resolve"
 # ---------- reports (daily aggregate view; distinct from delivery-level cases above) ----------
 @router.get("/dashboard/summary")
 @router.get("/reports/summary")
-def r_summary(start: dt.date | None = None, end: dt.date | None = None, u: User = Depends(require("report:read")), db: Session = Depends(get_db)):
-    s = analytics.summary(db, u.org_id, *_rng(start, end))
+def r_summary(start: dt.date | None = None, end: dt.date | None = None, compare: bool = False,
+              u: User = Depends(require("report:read")), db: Session = Depends(get_db)):
+    """compare=true also returns `previous`: the same figures for the period of equal length just before, in one round trip."""
+    a, b = _rng(start, end)
+    s = analytics.summary(db, u.org_id, a, b)
+    if compare:
+        pe = a - dt.timedelta(days=1)
+        ps = pe - dt.timedelta(days=(b - a).days)
+        s["previous"] = analytics.summary(db, u.org_id, ps, pe)
+        s["previous_range"] = [ps.isoformat(), pe.isoformat()]
     s["open_cases"] = db.scalar(select(func.count()).select_from(ReconciliationCase).where(ReconciliationCase.org_id == u.org_id, ReconciliationCase.status == "open"))
     s["generated_at"] = dt.datetime.now(dt.timezone.utc).isoformat()
     return s

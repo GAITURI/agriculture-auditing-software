@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="js/theme-init.js"></script>
+  <title>Import workbook · SCIPEC Operations</title>
+  <link rel="stylesheet" href="vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="import.html" data-title="Import workbook" data-perm="import:write">
+  <a class="visually-hidden-focusable" href="#content">Skip to content</a>
+  <div class="d-flex min-vh-100">
+    <aside id="sidebar" class="offcanvas-lg offcanvas-start sidebar" tabindex="-1" aria-label="Navigation"></aside>
+    <div class="flex-grow-1 d-flex flex-column min-w-0">
+      <header id="topbar" class="topbar"></header>
+      <main id="content" class="flex-grow-1 p-3 p-lg-4">
+        <p class="text-muted">Upload the SCIPEC .xlsx workbook. Preview first: nothing is saved until you import, and if any row is invalid the whole import is rejected. Submitted and approved records are never overwritten.</p>
+        <form id="importForm" class="card card-body mb-3" novalidate>
+          <div class="alert alert-danger d-none form-error" role="alert"></div>
+          <div class="row g-3 align-items-end">
+            <div class="col-md-5"><label class="form-label" for="file">Excel file (.xlsx)</label><input class="form-control" type="file" id="file" accept=".xlsx" required></div>
+            <div class="col-md-4"><label class="form-label" for="mode">Blank cells</label><select class="form-select" id="mode"><option value="merge">Keep existing values</option><option value="replace">Clear existing values</option></select></div>
+            <div class="col-md-3 d-flex gap-2"><button class="btn btn-outline-primary" type="submit">Preview</button><button class="btn btn-primary" type="button" id="commit" disabled>Import now</button></div>
+          </div></form>
+        <div id="report"></div>
+      </main>
+      <footer class="px-4 py-3 tw-text-sm tw-text-gray-600">SCIPEC · <a href="https://scipec.vercel.app" target="_blank" rel="noopener">scipec.vercel.app</a></footer>
+    </div>
+  </div>
+  <div id="toasts" class="toast-container position-fixed bottom-0 end-0 p-3" aria-live="polite"></div>
+
+  <script src="vendor/bootstrap.bundle.min.js"></script>
+  <script type="module" src="js/import.js"></script>
+</body>
+</html>

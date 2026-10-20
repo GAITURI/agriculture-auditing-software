@@ -8,7 +8,7 @@ D = Decimal
 
 
 def _check_period(v):
-    if not C.CYCLE_START <= v <= C.CYCLE_END:
+    if (C.CYCLE_START and v < C.CYCLE_START) or (C.CYCLE_END and v > C.CYCLE_END):
         raise ValueError(f"date must be within {C.CYCLE_START}..{C.CYCLE_END}")
     if v > dt.date.today():
         raise ValueError("future-dated records are not allowed")

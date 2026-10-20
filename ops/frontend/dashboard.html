@@ -3,39 +3,46 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <script src="env.js"></script>
   <script src="js/theme-init.js"></script>
   <title>Overview · SCIPEC Operations</title>
   <link rel="stylesheet" href="vendor/bootstrap.min.css">
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/styles.css">
 </head>
-<body data-page="dashboard.html" data-title="Overview" data-perm="report:read">
+<body data-page="dashboard.html" data-title="Overview" data-perm="report:read" data-subtitle="Live view of collection, factory output and reconciliation">
   <a class="visually-hidden-focusable" href="#content">Skip to content</a>
   <div class="d-flex min-vh-100">
-    <aside id="sidebar" class="offcanvas-lg offcanvas-start sidebar" tabindex="-1" aria-label="Navigation"></aside>
+    <aside id="sidebar" class="offcanvas offcanvas-start nav-drawer" tabindex="-1" aria-label="Navigation"></aside>
     <div class="flex-grow-1 d-flex flex-column min-w-0">
       <header id="topbar" class="topbar"></header>
       <main id="content" class="flex-grow-1 p-3 p-lg-4">
-        <div class="d-flex flex-wrap align-items-end gap-3 mb-4">
-          <div class="flex-grow-1"><h2 class="fs-4 mb-0" id="greet">Hi</h2><p class="text-muted mb-0 small" id="sub">Loading operations overview…</p></div>
-          <form id="rangeForm" class="d-flex flex-wrap gap-2 align-items-end">
-            <div><label class="form-label small mb-1" for="start">From</label><input class="form-control form-control-sm" type="date" id="start" required></div>
-            <div><label class="form-label small mb-1" for="end">To</label><input class="form-control form-control-sm" type="date" id="end" required></div>
-            <button class="btn btn-primary btn-sm" type="submit">Refresh</button></form></div>
-        <div id="alerts"></div>
-        <section aria-label="Key figures"><div id="kpis" class="row g-3 mb-3"></div><div id="tiles" class="row g-3 mb-4"></div></section>
-        <div class="row g-3 mb-3">
-          <div class="col-xl-8"><section class="card h-100"><div class="card-body">
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3"><h2 class="panel-title">Tonnage trend</h2>
-              <div class="btn-group" role="group" aria-label="Group chart by">
-                <input type="radio" class="btn-check" name="freq" id="fD" value="D" checked><label class="btn btn-outline-primary btn-sm" for="fD">Daily</label>
-                <input type="radio" class="btn-check" name="freq" id="fW" value="W"><label class="btn btn-outline-primary btn-sm" for="fW">Weekly</label>
-                <input type="radio" class="btn-check" name="freq" id="fM" value="M"><label class="btn btn-outline-primary btn-sm" for="fM">Monthly</label></div></div>
-            <div id="chart"></div></div></section></div>
-          <div class="col-xl-4"><section class="card h-100"><div class="card-body"><div class="d-flex justify-content-between align-items-center mb-2"><h2 class="panel-title">In transit now</h2><a href="deliveries.html" class="small">See all</a></div><ul id="transit" class="list-unstyled mb-0"></ul></div></section></div></div>
-        <div class="row g-3">
-          <div class="col-lg-6"><section class="card h-100"><div class="card-body"><div class="d-flex justify-content-between align-items-center mb-2"><h2 class="panel-title">Open reconciliation cases</h2><a href="cases.html" class="small">See all</a></div><ul id="cases" class="list-unstyled mb-0"></ul></div></section></div>
-          <div class="col-lg-6"><section class="card h-100"><div class="card-body"><h2 class="panel-title mb-2" id="sideTitle">Recent activity</h2><ul id="activityList" class="list-unstyled mb-0 small"></ul></div></section></div></div>
+        <div class="page-head">
+          <div><p class="eyebrow" id="hello">Welcome</p><h2 class="fs-3 fw-bold m-0">Operations overview</h2></div>
+          <div class="d-flex flex-column align-items-md-end gap-2">
+            <div class="seg" role="group" aria-label="Reporting period" id="periods">
+              <button type="button" data-p="30d" aria-pressed="false">30 days</button><button type="button" data-p="90d" aria-pressed="false">90 days</button><button type="button" data-p="month" aria-pressed="false">This month</button><button type="button" data-p="year" aria-pressed="false">This year</button><button type="button" data-p="custom" aria-pressed="false">Custom</button></div>
+            <form id="customForm" class="d-none gap-2 align-items-end">
+              <div><label class="form-label small mb-1" for="start">From</label><input class="form-control form-control-sm" type="date" id="start" required></div>
+              <div><label class="form-label small mb-1" for="end">To</label><input class="form-control form-control-sm" type="date" id="end" required></div>
+              <button class="btn btn-primary btn-sm" type="submit">Apply</button></form>
+            <div class="small text-muted" id="periodNote" role="status"></div></div></div>
+        <div id="attention"></div>
+        <div id="data">
+          <section id="kpis" class="kpi-grid" aria-label="Key figures"></section>
+          <div class="grid-main">
+            <section class="card card-pad"><div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3"><h2 class="panel-title">Tonnage</h2>
+              <div class="seg" role="group" aria-label="Group chart by" id="freq"><button type="button" data-f="D" aria-pressed="false">Daily</button><button type="button" data-f="W" aria-pressed="false">Weekly</button><button type="button" data-f="M" aria-pressed="false">Monthly</button></div></div>
+              <div id="chart"></div></section>
+            <section class="card card-pad"><h2 class="panel-title mb-3">Production by block</h2><div id="blocks"></div></section></div>
+          <details class="card mb-3" id="more"><summary>All figures for this period</summary><div class="card-pad"><div class="figures" id="figures"></div></div></details></div>
+        <div id="emptyState" class="card empty d-none"></div>
+        <div class="grid-two">
+          <section class="card card-pad"><div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2"><h2 class="panel-title">Deliveries</h2>
+            <div class="seg" role="group" aria-label="Delivery list" id="tabs"><button type="button" data-t="transit" aria-pressed="true">In transit</button><button type="button" data-t="cases" aria-pressed="false">Open cases</button></div></div>
+            <div id="deliv"></div><a class="small d-inline-block mt-2" id="delivAll" href="deliveries.html">View all deliveries</a></section>
+          <section class="card card-pad"><h2 class="panel-title mb-3" id="actTitle">Recent activity</h2><div id="activity"></div></section></div>
       </main>
       <footer class="px-4 py-3 tw-text-sm tw-text-gray-600">SCIPEC · <a href="https://scipec.vercel.app" target="_blank" rel="noopener">scipec.vercel.app</a></footer>
     </div>

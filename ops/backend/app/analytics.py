@@ -53,13 +53,14 @@ def summary(db, org_id, start, end):
     df = with_metrics(daily(db, org_id, start, end))
     s = lambda c: None if df[c].isna().all() else round(float(df[c].sum()), 3)
     proc, oil = s("processed"), s("oil")
+    past = df[df.index <= pd.Timestamp.today().normalize()]  # days that have not happened yet are not "missing"
     return {"start": str(start), "end": str(end), "harvested": s("harvested"), "collected": s("collected"),
             "transported": s("transported"), "left_in_field": s("left"), "received": s("received"),
             "processed": proc, "oil": oil, "downtime": s("downtime"),
             "yield_pct": round(oil / proc * 100, 2) if proc and oil is not None else None,
-            "missing_days": int((df["status"] == "missing").sum()),
-            "flagged_days": int((df["status"] == "flag").sum()),
-            "oer_alerts": int(df["oer_alert"].sum())}
+            "missing_days": int((past["status"] == "missing").sum()),
+            "flagged_days": int((past["status"] == "flag").sum()),
+            "oer_alerts": int(past["oer_alert"].sum())}
 
 
 def timeseries(db, org_id, start, end, freq="D"):

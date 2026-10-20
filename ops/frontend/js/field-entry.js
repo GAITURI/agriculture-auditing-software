@@ -1,7 +1,7 @@
 import { initPage } from './navigation.js'
 import { get, post, request, getConfig } from './api.js'
 import { can } from './auth.js'
-import { $, badge, bindForm, esc, fillSelect, fmt, uuid } from './components.js'
+import { $, addDays, badge, bindForm, esc, fillSelect, fmt, todayStr, uuid, ymd } from './components.js'
 import { toast } from './notifications.js'
 
 const n = v => (v === '' || v == null ? null : Number(v))
@@ -12,8 +12,7 @@ async function main() {
   if (!cfg) return
   const form = $('#entryForm'), q = k => form[k]
   fillSelect(q('block'), cfg.blocks)
-  const today = new Date().toISOString().slice(0, 10)
-  q('date').min = cfg.cycle_start; q('date').max = today < cfg.cycle_end ? today : cfg.cycle_end; q('date').value = q('date').max
+  q('date').max = todayStr(); q('date').value = todayStr()  // any past date can be entered
   if (can('fruit:submit')) $('#saveSubmit').classList.remove('d-none')
   let key = uuid(), existing = [], submitAfter = false
 
@@ -36,7 +35,7 @@ async function main() {
     $('#coverage').innerHTML = cfg.blocks.map(b => { const r = existing.find(x => x.block === b); return `<li><span>${esc(b)}</span>${r ? badge(r.status) : '<span class="tagx t-open">missing</span>'}</li>` }).join('')
     update()
   }
-  const recent = () => get(`/api/v1/fruit-collection?sort=-date&page_size=5&start=${cfg.cycle_start}&end=${cfg.cycle_end}`).then(d => {
+  const recent = () => get(`/api/v1/fruit-collection?sort=-date&page_size=5&start=${ymd(addDays(new Date(), -365))}&end=${todayStr()}`).then(d => {
     $('#recent').innerHTML = d.items.length ? d.items.map(r => `<li><span>${esc(r.date)} · ${esc(r.block)}<br><span class="text-muted">${fmt(r.harvested)} t harvested</span></span>${badge(r.status)}</li>`).join('') : '<li class="text-muted">No records yet.</li>'
   }).catch(e => { $('#recent').innerHTML = `<li class="text-danger" role="alert">${esc(e.message)}</li>` })
 

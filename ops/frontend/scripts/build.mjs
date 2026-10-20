@@ -1,13 +1,14 @@
 // Production build: one minified bundle per page (+ shared chunk), content-hashed file names, gzip copies.
 import { build, transform } from 'esbuild'
 import { createHash } from 'node:crypto'
-import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { cpSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { gzipSync } from 'node:zlib'
 
 const hash = b => createHash('sha1').update(b).digest('hex').slice(0, 10)
 rmSync('dist', { recursive: true, force: true })
 for (const d of ['js', 'css', 'vendor']) mkdirSync(`dist/${d}`, { recursive: true })
 
+cpSync('vendor/fonts', 'dist/vendor/fonts', { recursive: true })
 const pages = readdirSync('.').filter(f => f.endsWith('.html'))
 const entries = [...new Set(pages.flatMap(f => [...readFileSync(f, 'utf8').matchAll(/src="js\/([\w-]+)\.js"><\/script>\s*<\/body>/g)].map(m => m[1])))]
 const out = await build({ entryPoints: entries.map(e => `js/${e}.js`), bundle: true, splitting: true, format: 'esm', minify: true, sourcemap: true, target: 'es2020',

@@ -1,7 +1,7 @@
 import { initPage } from './navigation.js'
 import { get, patch, post, request, getConfig } from './api.js'
 import { can } from './auth.js'
-import { $, badge, bindForm, confirmAction, esc, fillSelect, fmt, loadTable, modal, resetForm, uuid } from './components.js'
+import { $, addDays, badge, bindForm, confirmAction, esc, fillSelect, fmt, loadTable, modal, resetForm, todayStr, uuid, ymd } from './components.js'
 import { toast } from './notifications.js'
 
 const num = v => (v === '' || v == null ? null : Number(v))
@@ -13,19 +13,19 @@ async function main() {
   if (!cfg) return
   const tbody = $('#rows'), pager = $('#pager'), form = $('#recordForm')
   fillSelect($('#fBlock'), cfg.blocks, 'All'); fillSelect($('#block'), cfg.blocks)
-  const today = new Date().toISOString().slice(0, 10)
-  $('#date').min = cfg.cycle_start; $('#date').max = today < cfg.cycle_end ? today : cfg.cycle_end
+  $('#date').max = todayStr()
+  $('#fFrom').value = ymd(addDays(new Date(), -89)); $('#fTo').value = todayStr(); $('#fFrom').max = $('#fTo').max = todayStr()
   let items = [], key = uuid(), editing = null
 
   const load = async (page = 1) => {
     items = await loadTable({ tbody, pager, path: '/api/v1/fruit-collection', page, onPage: load, colspan: 8, empty: 'No records match. Use "New record" to add one.',
-      params: { status: $('#fStatus').value, block: $('#fBlock').value, sort: $('#fSort').value, start: cfg.cycle_start, end: cfg.cycle_end },
+      params: { status: $('#fStatus').value, block: $('#fBlock').value, sort: $('#fSort').value, start: $('#fFrom').value, end: $('#fTo').value },
       row: r => `<tr><td>${esc(r.date)}</td><td>${esc(r.block)}</td><td>${fmt(r.harvested)}</td><td>${fmt(r.collected)}</td><td>${fmt(r.transported)}</td><td>${fmt(r.left_in_field)}</td><td>${badge(r.status)}</td><td class="text-nowrap">
         ${r.status === 'draft' && can('fruit:write') ? `<button class="btn btn-sm btn-outline-secondary" data-action="edit" data-id="${r.id}">Edit</button> ` : ''}
         ${r.status === 'draft' && can('fruit:submit') ? `<button class="btn btn-sm btn-outline-primary" data-action="submit" data-id="${r.id}">Submit</button>` : ''}
         ${r.status === 'submitted' && can('fruit:approve') ? (r.created_by === user.id ? '<span class="small text-muted">Needs a second approver</span>' : `<button class="btn btn-sm btn-primary" data-action="approve" data-id="${r.id}">Approve</button>`) : ''}</td></tr>` })
   }
-  ;['#fStatus', '#fBlock', '#fSort'].forEach(s => $(s).addEventListener('change', () => load(1)))
+  ;['#fStatus', '#fBlock', '#fSort', '#fFrom', '#fTo'].forEach(s => $(s).addEventListener('change', () => load(1)))
 
   const left = () => { const h = $('#harvested').value, c = $('#collected').value; $('#leftCalc').textContent = h === '' || c === '' ? '–' : (Number(h) - Number(c)).toFixed(3) }
   ;['#harvested', '#collected'].forEach(s => $(s).addEventListener('input', left))

@@ -21,6 +21,9 @@ const IC = {
   moon: '<path d="M21 13A9 9 0 1111 3a7 7 0 0010 10z"/>',
   bell: '<path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M10 21a2 2 0 004 0"/>',
   logout: '<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>',
+  check: '<path d="M4 12.5l5 5L20 6.5"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
   oil: '<path d="M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z"/>',
 }
 export const icon = (n, size = 20) => `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${IC[n]}</svg>`
@@ -104,3 +107,28 @@ export function downloadCsv(name, head, rows) {
 }
 
 
+
+// ---- dates (local time, so "today" matches the user's calendar) ----
+const p2 = n => String(n).padStart(2, '0')
+export const ymd = d => `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`
+export const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x }
+export const todayStr = () => ymd(new Date())
+
+/** Period presets for the dashboard and reports. Returns [start, end] as YYYY-MM-DD. */
+export function presetRange(key) {
+  const t = new Date(), end = ymd(t)
+  if (key === '30d') return [ymd(addDays(t, -29)), end]
+  if (key === '90d') return [ymd(addDays(t, -89)), end]
+  if (key === 'month') return [ymd(new Date(t.getFullYear(), t.getMonth(), 1)), end]
+  if (key === 'lastmonth') return [ymd(new Date(t.getFullYear(), t.getMonth() - 1, 1)), ymd(new Date(t.getFullYear(), t.getMonth(), 0))]
+  if (key === 'year') return [`${t.getFullYear()}-01-01`, end]
+  return null
+}
+
+export function relTime(iso) {
+  const d = new Date(iso), s = (Date.now() - d) / 1000
+  if (s < 60) return 'just now'
+  if (s < 3600) return `${Math.floor(s / 60)} min ago`
+  if (s < 86400) return `${Math.floor(s / 3600)} h ago`
+  return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) + ', ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
+}

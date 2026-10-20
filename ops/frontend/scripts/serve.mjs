@@ -9,7 +9,7 @@ const SRC = process.argv.includes('--src')
 const ROOT = resolve(SRC ? '.' : 'dist')
 const PORT = Number(process.env.PORT || 5173)
 const API = new URL(process.env.API_TARGET || 'http://127.0.0.1:8000')
-const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.map': 'application/json', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon' }
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.map': 'application/json', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.ico': 'image/x-icon' }
 const proxied = p => p.startsWith('/api/') || p.startsWith('/health') || p === '/docs' || p === '/openapi.json'
 
 http.createServer((req, res) => {
@@ -25,7 +25,7 @@ http.createServer((req, res) => {
   const file = resolve(ROOT, '.' + path)
   if (!file.startsWith(ROOT + sep) || !existsSync(file) || !statSync(file).isFile()) { res.writeHead(404, { 'content-type': 'text/plain' }); return res.end('Not found') }
   const ext = extname(file)
-  const hashed = /[-.][A-Za-z0-9]{8,}\.(js|css)$/.test(file)  // content-hashed names never change -> cache for a year
+  const hashed = /[-.][A-Za-z0-9]{8,}\.(js|css)$/.test(file) || ext === '.woff2'  // content-hashed names never change -> cache for a year
   const h = { 'content-type': TYPES[ext] || 'application/octet-stream', 'x-content-type-options': 'nosniff', 'cache-control': SRC ? 'no-store' : hashed ? 'public, max-age=31536000, immutable' : 'no-cache' }
   const gz = !SRC && /gzip/.test(req.headers['accept-encoding'] || '') && ['.html', '.js', '.css'].includes(ext) && existsSync(file + '.gz')
   if (gz) { h['content-encoding'] = 'gzip'; h.vary = 'accept-encoding' }

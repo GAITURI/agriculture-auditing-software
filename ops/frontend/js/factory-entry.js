@@ -1,7 +1,7 @@
 import { initPage } from './navigation.js'
 import { get, post, getConfig } from './api.js'
 import { can } from './auth.js'
-import { $, bindForm, esc, fmt, loadTable, uuid } from './components.js'
+import { $, addDays, bindForm, esc, fmt, loadTable, todayStr, uuid, ymd } from './components.js'
 import { toast } from './notifications.js'
 
 const n = v => (v === '' || v == null ? null : Number(v))
@@ -13,11 +13,10 @@ async function main() {
   const form = $('#dayForm'), q = k => form[k]
   let key = uuid()
   const load = page => loadTable({ tbody: $('#rows'), pager: $('#pager'), path: '/api/v1/factory-production', page, onPage: load, colspan: 6, empty: 'No production days recorded yet.',
-    params: { start: cfg.cycle_start, end: cfg.cycle_end },
+    params: { start: ymd(addDays(new Date(), -89)), end: todayStr() },
     row: r => `<tr><td>${esc(r.date)}</td><td>${fmt(r.total_received)}</td><td>${fmt(r.processed)}</td><td>${fmt(r.oil)}</td><td>${r.processed ? fmt(r.oil / r.processed * 100) : '–'}</td><td>${fmt(r.downtime)}</td></tr>` })
   if (!can('factory:write')) { $('#formRow').classList.add('d-none'); load(1); return }
-  const today = new Date().toISOString().slice(0, 10)
-  q('date').min = cfg.cycle_start; q('date').max = today < cfg.cycle_end ? today : cfg.cycle_end; q('date').value = q('date').max
+  q('date').max = todayStr(); q('date').value = todayStr()  // any past date can be entered
 
   const update = () => {
     const parts = ['ffb_banakanuke', 'ffb_batchepo', 'ffb_bakilo'].map(k => n(q(k).value)).filter(v => v != null)

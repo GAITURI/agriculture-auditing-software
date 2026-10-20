@@ -7,13 +7,13 @@ import pandas as pd
 from fastapi import APIRouter, Depends, File, Header, Query, UploadFile
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
-from sqlalchemy import func, select
+from sqlalchemy import and_, func, select
 from sqlalchemy.orm import Session
 
 from . import analytics, config as C, services as S
 from .database import get_db
 from .errors import AppError
-from .models import AuditEvent, Block, Delivery, FactoryProduction, FruitCollection, ReconciliationCase, User
+from .models import AuditEvent, Block, Delivery, FactoryProduction, FruitCollection, ReconciliationCase, Site, User
 from .schemas import DeliveryIn, FactoryIn, FruitIn, FruitPatch, LoginIn, ReceiptIn, RefreshIn, ResolveIn
 from .security import DUMMY, PERMISSIONS, allowed, current_user, decode, make_token, require, verify_password
 
@@ -28,9 +28,12 @@ def reply(res):
 
 
 def _rng(start, end):
-    start, end = start or C.CYCLE_START, end or C.CYCLE_END
+    end = end or C.CYCLE_END or dt.date.today()
+    start = start or C.CYCLE_START or end - dt.timedelta(days=29)  # default: the last 30 days
     if start > end:
         raise AppError(422, "invalid_range", "start must be on or before end")
+    if (end - start).days > 731:
+        raise AppError(422, "range_too_large", "Choose a period of two years or less.")
     return start, end
 
 
@@ -137,7 +140,7 @@ def save_factory(p: FactoryIn, key: str | None = Key, u: User = Depends(require(
 def list_factory(start: dt.date | None = None, end: dt.date | None = None, page: int = Page(), page_size: int = Size(),
                  u: User = Depends(require("factory:read")), db: Session = Depends(get_db)):
     start, end = _rng(start, end)
-    q = select(FactoryProduction).where(FactoryProduction.org_id == u.org_id, FactoryProduction.date.between(start, end)).order_by(FactoryProduction.date)
+    q = select(FactoryProduction).where(FactoryProduction.org_id == u.org_id, FactoryProduction.date.between(start, end)).order_by(FactoryProduction.date.desc())
     return S.paginate(db, q, page, page_size, lambda r: {"id": r.id, "date": r.date.isoformat(), "total_received": r.total_received and float(r.total_received),
                       "processed": r.processed and float(r.processed), "oil": r.oil and float(r.oil), "downtime": r.downtime and float(r.downtime), "version": r.version})
 
@@ -213,6 +216,18 @@ def r_series(start: dt.date | None = None, end: dt.date | None = None, freq: str
     return analytics.timeseries(db, u.org_id, *_rng(start, end), freq)
 
 
+@router.get("/dashboard/blocks")
+def r_blocks(start: dt.date | None = None, end: dt.date | None = None, u: User = Depends(require("report:read")), db: Session = Depends(get_db)):
+    """Totals per block for the period (submitted and approved records only); blocks with no records are listed with nulls."""
+    a, b = _rng(start, end)
+    live = and_(FruitCollection.block_id == Block.id, FruitCollection.date.between(a, b), FruitCollection.status != "draft")
+    q = (select(Block.name, func.sum(FruitCollection.harvested), func.sum(FruitCollection.collected), func.sum(FruitCollection.transported), func.sum(FruitCollection.left_in_field))
+         .select_from(Block).join(Site, Site.id == Block.site_id).outerjoin(FruitCollection, live)
+         .where(Site.org_id == u.org_id, Block.is_active).group_by(Block.id, Block.name).order_by(Block.id))
+    f = lambda v: None if v is None else float(v)
+    return [{"block": n, "harvested": f(h), "collected": f(c), "transported": f(t), "left_in_field": f(l)} for n, h, c, t, l in db.execute(q)]
+
+
 @router.get("/reports/monthly")
 def r_monthly(start: dt.date | None = None, end: dt.date | None = None, u: User = Depends(require("report:read")), db: Session = Depends(get_db)):
     return analytics.timeseries(db, u.org_id, *_rng(start, end), "M")
@@ -233,13 +248,33 @@ def r_variance(u: User = Depends(require("reconcile:read")), db: Session = Depen
 @router.get("/audit")
 def audit_log(entity: str | None = None, entity_id: str | None = None, page: int = Page(), page_size: int = Size(),
               u: User = Depends(require("audit:read")), db: Session = Depends(get_db)):
-    q = select(AuditEvent).where(AuditEvent.org_id == u.org_id).order_by(AuditEvent.id.desc())
+    q = (select(AuditEvent, User.full_name, User.email).outerjoin(User, User.id == AuditEvent.actor_id)
+         .where(AuditEvent.org_id == u.org_id).order_by(AuditEvent.id.desc()))
     if entity:
         q = q.where(AuditEvent.entity == entity)
     if entity_id:
         q = q.where(AuditEvent.entity_id == entity_id)
-    return S.paginate(db, q, page, page_size, lambda a: {"id": a.id, "at": a.at.isoformat(), "actor_id": a.actor_id, "entity": a.entity, "entity_id": a.entity_id,
-                      "action": a.action, "reason": a.reason, "correlation_id": a.correlation_id, "before": a.before, "after": a.after})
+    res = S.paginate(db, q, page, page_size, lambda a, fn, em: {
+        "id": a.id, "at": a.at.isoformat(), "actor_id": a.actor_id, "actor": fn or (em.split("@")[0] if em else "System"), "entity": a.entity,
+        "entity_id": a.entity_id, "action": a.action, "reason": a.reason, "correlation_id": a.correlation_id, "before": a.before, "after": a.after})
+    ids = lambda e: [int(i["entity_id"]) for i in res["items"] if i["entity"] == e and i["entity_id"].isdigit()]
+    labels = {}
+    if x := ids("fruit_collection"):
+        for r_, n in db.execute(S.fruit_query(u).where(FruitCollection.id.in_(x))):
+            labels[("fruit_collection", str(r_.id))] = f"{n} · {r_.date}"
+    if x := ids("delivery"):
+        for d in db.scalars(select(Delivery).where(Delivery.id.in_(x), Delivery.org_id == u.org_id)):
+            labels[("delivery", str(d.id))] = d.reference
+    if x := ids("factory_production"):
+        for f_ in db.scalars(select(FactoryProduction).where(FactoryProduction.id.in_(x), FactoryProduction.org_id == u.org_id)):
+            labels[("factory_production", str(f_.id))] = str(f_.date)
+    if x := ids("reconciliation_case"):
+        for c_, ref in db.execute(select(ReconciliationCase, Delivery.reference).join(Delivery, Delivery.id == ReconciliationCase.delivery_id)
+                                  .where(ReconciliationCase.id.in_(x), ReconciliationCase.org_id == u.org_id)):
+            labels[("reconciliation_case", str(c_.id))] = ref
+    for i in res["items"]:
+        i["label"] = labels.get((i["entity"], i["entity_id"]))
+    return res
 
 
 # ---------- Excel import: validated preview, then atomic commit (drafts only; submitted/approved are never overwritten) ----------

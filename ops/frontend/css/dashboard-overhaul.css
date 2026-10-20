@@ -1,0 +1,517 @@
+
+/* SCIPEC Operations — dashboard design system */
+
+:root {
+    color-scheme: light;
+    --ops-bg: #f6f7f4;
+    --ops-surface: #ffffff;
+    --ops-surface-soft: #f0f3ed;
+    --ops-text: #202b24;
+    --ops-muted: #69766c;
+    --ops-border: #e0e6de;
+    --ops-green: #176345;
+    --ops-green-hover: #104d35;
+    --ops-green-soft: #e8f2eb;
+    --ops-amber-soft: #fff3d8;
+    --ops-red-soft: #fbeae7;
+    --ops-radius: 16px;
+    --ops-shadow: 0 2px 8px rgb(27 48 33 / 4%);
+  }
+  
+  html {
+    min-height: 100%;
+    background: var(--ops-bg);
+  }
+  
+  body {
+    margin: 0;
+    background: var(--ops-bg) !important;
+    color: var(--ops-text);
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+      sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  
+  /* Prevent inherited theme effects from blurring the actual interface. */
+  body,
+  .ops-app,
+  .ops-main,
+  .ops-topbar,
+  .ops-panel,
+  .ops-kpi-grid,
+  .ops-secondary-grid,
+  .ops-date-panel {
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  
+  .ops-app {
+    min-height: 100vh;
+    background: var(--ops-bg);
+  }
+  
+  .ops-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    min-height: 68px;
+    display: flex;
+    align-items: center;
+    padding: 12px clamp(18px, 4vw, 52px);
+    background: var(--ops-surface) !important;
+    border-bottom: 1px solid var(--ops-border);
+  }
+  
+  .ops-main {
+    width: 100%;
+    max-width: 1600px;
+    margin-inline: auto;
+    padding: 36px clamp(18px, 4vw, 52px) 24px;
+  }
+  
+  .ops-page-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 28px;
+    margin-bottom: 30px;
+  }
+  
+  .ops-eyebrow {
+    margin: 0 0 8px;
+    color: var(--ops-green);
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 0.13em;
+    line-height: 1.4;
+  }
+  
+  .ops-page-heading h1 {
+    margin: 0;
+    font-size: clamp(25px, 3vw, 34px);
+    font-weight: 720;
+    letter-spacing: -0.045em;
+    line-height: 1.2;
+  }
+  
+  .ops-muted {
+    margin: 7px 0 0;
+    color: var(--ops-muted) !important;
+    font-size: 13px;
+  }
+  
+  .ops-date-panel {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 14px;
+    background: var(--ops-surface);
+    border: 1px solid var(--ops-border);
+    border-radius: 14px;
+  }
+  
+  .ops-date-fields {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .ops-date-fields label {
+    display: grid;
+    gap: 5px;
+    min-width: 140px;
+  }
+  
+  .ops-date-fields label span {
+    color: var(--ops-muted);
+    font-size: 11px;
+    font-weight: 650;
+  }
+  
+  .ops-date-fields .form-control {
+    min-height: 38px;
+    border-color: var(--ops-border);
+    background: #fff;
+    color: var(--ops-text);
+    font-size: 12px;
+    box-shadow: none;
+  }
+  
+  .ops-date-fields .form-control:focus {
+    border-color: var(--ops-green);
+    box-shadow: 0 0 0 3px rgb(23 99 69 / 12%);
+  }
+  
+  .ops-btn-primary {
+    min-height: 38px;
+    padding: 8px 16px;
+    border: 1px solid var(--ops-green);
+    border-radius: 9px;
+    background: var(--ops-green);
+    color: white;
+    font-size: 12px;
+    font-weight: 650;
+  }
+  
+  .ops-btn-primary:hover,
+  .ops-btn-primary:focus-visible {
+    border-color: var(--ops-green-hover);
+    background: var(--ops-green-hover);
+    color: white;
+  }
+  
+  /* KPI containers: JS should render individual cards inside these grids. */
+  .ops-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  
+  .ops-secondary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 34px;
+  }
+  
+  .ops-kpi-grid > *,
+  .ops-secondary-grid > * {
+    min-width: 0;
+    padding: 21px;
+    overflow-wrap: anywhere;
+    background: var(--ops-surface) !important;
+    color: var(--ops-text) !important;
+    border: 1px solid var(--ops-border);
+    border-radius: var(--ops-radius);
+    box-shadow: var(--ops-shadow);
+  }
+  
+  .ops-kpi-grid > * h3,
+  .ops-kpi-grid > * h4,
+  .ops-kpi-grid > * h5,
+  .ops-secondary-grid > * h3,
+  .ops-secondary-grid > * h4,
+  .ops-secondary-grid > * h5 {
+    margin-bottom: 12px;
+    color: var(--ops-muted);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  .ops-kpi-grid > * strong,
+  .ops-kpi-grid > * .display-6,
+  .ops-kpi-grid > * .fs-2,
+  .ops-kpi-grid > * .fs-3 {
+    color: var(--ops-text);
+    font-size: clamp(23px, 2vw, 30px);
+    font-weight: 730;
+    letter-spacing: -0.045em;
+    line-height: 1.25;
+  }
+  
+  /* Keep status colors restrained; avoid full-card saturated backgrounds. */
+  .ops-kpi-grid .bg-primary,
+  .ops-kpi-grid .bg-success,
+  .ops-kpi-grid .bg-info,
+  .ops-kpi-grid .bg-warning,
+  .ops-kpi-grid .bg-danger,
+  .ops-secondary-grid .bg-primary,
+  .ops-secondary-grid .bg-success,
+  .ops-secondary-grid .bg-info,
+  .ops-secondary-grid .bg-warning,
+  .ops-secondary-grid .bg-danger {
+    background: var(--ops-surface) !important;
+  }
+  
+  .ops-kpi-grid .text-white,
+  .ops-secondary-grid .text-white {
+    color: var(--ops-text) !important;
+  }
+  
+  .ops-section {
+    margin-bottom: 28px;
+  }
+  
+  .ops-section-heading,
+  .ops-panel-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 17px;
+  }
+  
+  .ops-section-heading h2,
+  .ops-panel-heading h2 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 720;
+    letter-spacing: -0.025em;
+  }
+  
+  .ops-panel {
+    min-width: 0;
+    padding: 23px;
+    background: var(--ops-surface) !important;
+    color: var(--ops-text) !important;
+    border: 1px solid var(--ops-border);
+    border-radius: var(--ops-radius);
+    box-shadow: var(--ops-shadow);
+  }
+  
+  .ops-chart {
+    min-width: 0;
+    width: 100%;
+    min-height: 280px;
+    overflow: hidden;
+  }
+  
+  .ops-chart svg,
+  .ops-chart canvas {
+    max-width: 100%;
+  }
+  
+  .ops-period-switch {
+    display: inline-flex;
+    flex-shrink: 0;
+    gap: 3px;
+    margin: 0;
+    padding: 4px;
+    border: 1px solid var(--ops-border);
+    border-radius: 10px;
+    background: var(--ops-surface-soft);
+  }
+  
+  .ops-period-switch input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+  
+  .ops-period-switch label {
+    padding: 7px 11px;
+    border-radius: 7px;
+    color: var(--ops-muted);
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 650;
+  }
+  
+  .ops-period-switch input:checked + label {
+    background: var(--ops-surface);
+    color: var(--ops-green);
+    box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
+  }
+  
+  .ops-period-switch input:focus-visible + label {
+    outline: 2px solid var(--ops-green);
+    outline-offset: 2px;
+  }
+  
+  .ops-workspace-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+  
+  .ops-panel-heading {
+    align-items: center;
+  }
+  
+  .ops-text-link {
+    flex-shrink: 0;
+    color: var(--ops-green);
+    font-size: 12px;
+    font-weight: 650;
+    text-decoration: none;
+  }
+  
+  .ops-text-link:hover {
+    color: var(--ops-green-hover);
+    text-decoration: underline;
+  }
+  
+  .ops-record-list,
+  .ops-activity-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  
+  .ops-record-list > li {
+    padding: 14px 0;
+    border-top: 1px solid var(--ops-border);
+  }
+  
+  .ops-record-list > li:first-child {
+    border-top: 0;
+  }
+  
+  .ops-record-list a {
+    color: var(--ops-green);
+    font-weight: 650;
+  }
+  
+  .ops-activity-panel {
+    margin-bottom: 22px;
+  }
+  
+  .ops-activity-list > li {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(100px, 150px) minmax(0, 1fr);
+    gap: 18px;
+    padding: 15px 0;
+    border-top: 1px solid var(--ops-border);
+  }
+  
+  .ops-activity-list > li:first-child {
+    border-top: 0;
+  }
+  
+  .ops-activity-list time,
+  .ops-activity-list .activity-time {
+    color: var(--ops-muted);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  .ops-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 0 4px;
+    color: var(--ops-muted);
+    font-size: 11px;
+  }
+  
+  /* Navigation: always closed initially; Bootstrap opens it on demand. */
+  .ops-drawer {
+    --bs-offcanvas-width: 290px;
+    background: var(--ops-surface);
+    color: var(--ops-text);
+    border-right: 1px solid var(--ops-border);
+  }
+  
+  .ops-drawer-header {
+    min-height: 78px;
+    padding: 20px;
+    border-bottom: 1px solid var(--ops-border);
+  }
+  
+  .ops-drawer .offcanvas-body {
+    overflow-y: auto;
+  }
+  
+  .ops-drawer a {
+    text-decoration: none;
+  }
+  
+  /* Light theme must remain crisp and readable. */
+  [data-theme="light"] body,
+  [data-bs-theme="light"] body,
+  body.theme-light {
+    background: var(--ops-bg) !important;
+    color: var(--ops-text) !important;
+  }
+  
+  [data-theme="light"] .ops-panel,
+  [data-theme="light"] .ops-topbar,
+  [data-theme="light"] .ops-date-panel,
+  [data-bs-theme="light"] .ops-panel,
+  [data-bs-theme="light"] .ops-topbar {
+    background: #fff !important;
+    color: var(--ops-text) !important;
+    opacity: 1 !important;
+  }
+  
+  /* Responsive layout */
+  @media (max-width: 1100px) {
+    .ops-page-heading {
+      flex-direction: column;
+    }
+  
+    .ops-date-panel {
+      width: 100%;
+    }
+  
+    .ops-date-fields {
+      flex: 1;
+    }
+  
+    .ops-date-fields label {
+      flex: 1;
+    }
+  
+    .ops-kpi-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  
+  @media (max-width: 760px) {
+    .ops-main {
+      padding-top: 24px;
+    }
+  
+    .ops-workspace-grid,
+    .ops-secondary-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .ops-section-heading {
+      flex-direction: column;
+    }
+  
+    .ops-panel {
+      padding: 17px;
+    }
+  
+    .ops-date-panel {
+      align-items: stretch;
+      flex-direction: column;
+    }
+  
+    .ops-date-fields {
+      flex-direction: column;
+    }
+  
+    .ops-date-fields label {
+      min-width: 0;
+    }
+  
+    .ops-btn-primary {
+      width: 100%;
+    }
+  
+    .ops-activity-list > li {
+      grid-template-columns: 1fr;
+      gap: 5px;
+    }
+  
+    .ops-footer {
+      flex-direction: column;
+      gap: 3px;
+    }
+  }
+  
+  @media (max-width: 420px) {
+    .ops-kpi-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .ops-period-switch {
+      width: 100%;
+    }
+  
+    .ops-period-switch label {
+      flex: 1;
+      text-align: center;
+    }
+  }
+  
